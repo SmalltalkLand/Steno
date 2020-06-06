@@ -1,0 +1,5 @@
+let gs = 'ggaabberqt^^^'
+
+v1 = String.fromCharCode(...[].slice.call(eval('s').toString()).map(s => s.charCodeAt(0)).map((c,i) => c + (i * 2)))
+
+v2 = s2.replace(/./g,c => s2[c.charCodeAt(0) % s2.length]);

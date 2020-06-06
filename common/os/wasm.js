@@ -1,0 +1,1 @@
+export default v => WebAssembly.instantiateStreaming(fetch('/fs/wasm/os.wasm'),v)
