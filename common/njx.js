@@ -1,4 +1,5 @@
-const { dp } = require("./dp");
+import {dp} from './dp.js'
+import './poison.js'
 
 let inF = false;
 Function.stackFrames = [];
@@ -10,7 +11,7 @@ let oav = false;
 let oavd = false;
 fetch('http://googleads.g.doubleclick.net/pagead/gen_204?id=wfocus&gqid=advertisment&advert=ads').catch(() => {
     oav = true;
-    Function.hooks.push((o,t,a) => {v => doc && o === self.open ? (() => {let clean = false; v.addEventListener('message',evt => {if(evt.data.type === 'clean')clean = true});v.addEventListener('close',evt => {if(!clean){() => v = o.call(t,...a)}});dp(() => v)})(): v});
+    Function.hooks.push((o,t,a) => {return v => doc && o === self.open ? (() => {let clean = false; v.addEventListener('message',evt => {if(evt.data.type === 'clean')clean = true});v.addEventListener('close',evt => {if(!clean){() => v = o.call(t,...a)}});dp(() => v)})(): v});
 }).then(() => oavd = true);
 let loaded = false;
 self.addEventListener('load',() => loaded = true);
@@ -105,6 +106,7 @@ Function.prototype.constructor = (old => (oc = old) && function(...args){
             let hm = Function.hooks.map(h => rh(h,obj,t,args));
             inF = false;
             let v;
+            let cc;
             if(s.isolated && obj.toString().includes('[native code]') && !o){
                 inF = true;
                 s.ilog.push(s);
@@ -123,15 +125,29 @@ Function.prototype.constructor = (old => (oc = old) && function(...args){
                 inF = false;
             }else if(obj === setTimeout || obj === setInterval && Function.timeMachine.mode !== 0 && !o){
                 if(Function.timeMachine.mode === 1){
-                    if(obj === setTimeout)requestAnimationFrame(...args);
+                    if(obj === setTimeout)v = requestAnimationFrame(...args);
                     if(obj === setInterval){
                         inF = true;
-                        setInterval(...[...args.slice(0,args.length - 1),0]);
+                        v = setInterval(...[...args.slice(0,args.length - 1),0]);
                         inF = false;
                     }
                 }
-            } else if(hm.filter(h => h.callsCustom(obj))){
-
+            } else if(obj.isEventHandler && !o){
+                inF = true;
+                v = (async () => {
+                    let v;
+                    while(!v){
+                        v = await Function.prototype.apply.call(obj,t,args);
+                    };
+                    return v;
+                })();
+                inF = false;
+            }else if(cc = hm.filter(h => {inF = true; let vv = h.callsCustom(obj); inF = false; return vv})){
+                for (c of cc){
+                    inF = true;
+                    c(obj,t,args,x => v = x);
+                    inF = false;
+                }
             } else{
                 v = Function.prototype.apply.call(obj,t,args);
             };

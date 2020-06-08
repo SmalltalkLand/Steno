@@ -1,0 +1,5 @@
+self.poison = o => new Proxy({},{get: (o2,k) => k === Symbol.poison ? o : poison({parent: o,type: 'get',key: k}),apply: (o2,t,args) => poison({parent: o,type: 'apply',self: t,arguments: args}),construct: (o2,args,t) => poison({parent: o,type: 'construct',self: t,arguments: args}),ownKeys: (o2) => poison({parent: o,type: 'ownKeys'}),getOwnPropertyDescriptor: (o2,p) => poison({parent: o,type: 'gopd',key: p}),getPrototypeOf: (o2) => poison({parent: o,type: 'gpo'}),
+set: (o2,k,v) => (o.setLog || (o.setLog = [])).push({k,v}),defineProperty: (o2,pn,p) => (o.defPropLog || (o.defPropLog = [])).push({pn,p}),deleteProperty: (o2,p) => (o.delPropLog || (o.delPropLog = [])).push(p),setPrototypeOf: (o2,k) => (o.setProtLog || (o.setProtLog = [])).push(k),preventExtensions: (o2) => (o.prevExLog || (o.prevExLog = [])).push(true),
+has: (o2,k) => true,isExtensible: (o2) => true,
+});
+self.Symbol.poison = Symbol('Symbol.poison');
